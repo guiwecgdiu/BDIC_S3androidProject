@@ -26,5 +26,25 @@
         android:layout_height="wrap_content"
         android:text="下载"
         />
+    <Button
+        android:id="@+id/check_remoteList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="列出目录"/>
+    <Button
+        android:id="@+id/current_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="当前目录"/>
+    <Button
+        android:id="@+id/connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="连接"/>
+    <Button
+        android:id="@+id/disconnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="断开"/>
 
 </LinearLayout>

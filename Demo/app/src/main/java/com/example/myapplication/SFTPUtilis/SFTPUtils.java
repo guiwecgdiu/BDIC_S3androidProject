@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
@@ -198,9 +200,11 @@ import java.util.Vector;
                         }
                     }
                 }
-            } catch (SftpException e) {
-                e.printStackTrace();
-            } finally {
+            }
+//            catch (SftpException e) {
+//                e.printStackTrace();
+//            }
+           finally {
                 this.disconnect();
             }
             return false;
@@ -326,8 +330,37 @@ import java.util.Vector;
          */
 
         @SuppressWarnings("rawtypes")
-        public Vector listFiles(String directory) throws SftpException {
-            return sftp.ls(directory);
+        public Vector listFiles(String directory){
+            Vector v =null;
+            try {
+                v =  sftp.ls(directory);
+            }catch (SftpException e){
+                e.printStackTrace();
+            }
+                return v;
+            }
+
+
+
+        public String currentRemotePath(){
+            String s= "failed";
+            try {
+                s=sftp.pwd();
+            }catch (SftpException e){
+                e.printStackTrace();
+            }
+            return s;
+        }
+
+        public ArrayList<String> showChildNames(String directory) {
+            ArrayList<String> arrs = new ArrayList<String>();
+            Vector v = listFiles(directory);
+            Enumeration<ChannelSftp.LsEntry> elements = v.elements();
+            while (elements.hasMoreElements()){
+                ChannelSftp.LsEntry ls = elements.nextElement();
+                arrs.add(ls.getFilename());
+            }
+            return arrs;
         }
 
     }
