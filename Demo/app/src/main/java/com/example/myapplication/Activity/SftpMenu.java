@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activity;
 
 import android.app.Activity;
 import android.nfc.Tag;
@@ -8,14 +8,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.myapplication.R;
 import com.example.myapplication.SFTPUtilis.SFTPUtils;
 import com.jcraft.jsch.SftpException;
 
 import java.io.File;
 
 
-public class MainActivity extends Activity implements View.OnClickListener {
-    private final String TAG = "MainActivity";
+public class SftpMenu extends Activity implements View.OnClickListener {
+    private final String TAG = "SftpMenu";
     private Button buttonUpLoad = null;
     private Button buttonDownLoad = null;
     private Button buttonConnect = null;
