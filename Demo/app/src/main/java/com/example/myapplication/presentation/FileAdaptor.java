@@ -41,6 +41,7 @@ public class FileAdaptor extends ArrayAdapter<File> {
      ImageView iIcon = v.findViewById(R.id.iFileIcon);
      TextView iFileName = v.findViewById(R.id.iFileName);
 
+     iIcon.setImageResource(R.mipmap.folder);
      iFileName.setText(f.getName());
 
     return v;

@@ -6,12 +6,12 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tCurrentDir_actFolder"
+        android:id="@+id/tCurrentDir"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/darker_gray"/>
     <ListView
-        android:id="@+id/lFolderExplore_actFolder"
+        android:id="@+id/lFolderExplore"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
