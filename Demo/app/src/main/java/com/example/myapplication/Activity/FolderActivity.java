@@ -3,6 +3,7 @@ package com.example.myapplication.Activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.nfc.Tag;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -11,6 +12,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ public class FolderActivity extends AppCompatActivity {
     FileAdaptor fad;
     ArrayList<File> fileList;
     String rootPath;
+
 
     Stack<String> curPathStack;
 
@@ -78,6 +82,7 @@ public class FolderActivity extends AppCompatActivity {
         tCurPath.setText(getPathString());
         fad = new FileAdaptor(this,R.layout.item_type1,fileList);
         initAdaptor();
+        initListener();
     }
 
     @Override
@@ -86,14 +91,6 @@ public class FolderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_folder);
         powerPermission();
         init();
-
-
-//       for(int i=0;i<files.length;i++){
-//           fileList.add(files[i]);
-//       }
-     //  Log.d(TAG,"The file list has size of "+fileList.size());
-        //File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        //Log.d(TAG,dir.listFiles().length+"");
 
     }
 
@@ -108,40 +105,53 @@ public class FolderActivity extends AppCompatActivity {
         lFolderlist.setAdapter(fad);
     }
 
+    /*
+        *init list item onclick listener
+     */
+    protected void initListener(){
+        lFolderlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ListView item =(ListView) parent;
+                File itemf = (File) parent.getAdapter().getItem(position);
+                String name = itemf.getName();
+                Log.d(TAG,name+"is clcked");
+                curPathStack.push("/"+name);
+                showChange(getPathString());
+            }
+        });
+    }
+
+    protected void showChange(String path){
+        Log.d(TAG,path);
+        File [] files = new File(path).listFiles();
+        if(files!=null) {
+            fileList.clear();
+            for (int i = 0; i < files.length; i++) {
+                fileList.add(files[i]);
+            }
+        }else {
+            Toast.makeText(this,"It doesn't has children folder",Toast.LENGTH_LONG).show();
+            curPathStack.pop();
+        }
+        fad.notifyDataSetChanged();
+        tCurPath.setText(getPathString());
+    }
+
     protected String getPathString(){
         Stack<String> temp = new Stack<String>();
         temp.addAll(curPathStack);
         String result= "";
         i=0;
         while (!temp.empty()){
-            result+=temp.pop();
+            result=temp.pop()+result;
             i++;
         }
        // Log.d(TAG,i+"+++");
         return result;
     }
 
-    protected void  loadFilelistWithpermission(){
 
-        if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)
-        {
-            //granted
-          //  Log.d(TAG, "Sucessful read external storage with length = "+Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).listFiles());
-          //  String [] files = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).list();
-//            for(int i=0;i<Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).list().length;i++){
-//                fileList.add(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).list()[i]);
-//            }
-           // Log.d(TAG,"The array length is"+fileList.size());
-
-        }else {
-            //not granted
-            Log.d(TAG,"No permission");
-            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Toast.makeText(this,"In my app, the permission is needed",Toast.LENGTH_LONG).show();
-            }
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RequestCode.REQUEST_WESTORAGE);
-        }
-    }
 
 
 
@@ -166,6 +176,7 @@ public class FolderActivity extends AppCompatActivity {
         }else{
             Log.d(TAG,"line95: The writeExternal is granted");
         }
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
