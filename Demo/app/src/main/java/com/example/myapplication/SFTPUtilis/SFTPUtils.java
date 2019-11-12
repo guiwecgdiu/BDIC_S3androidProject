@@ -67,6 +67,8 @@ import java.util.Vector;
         }
 
 
+
+
         /**
          * 断开服务器
          */
@@ -84,6 +86,16 @@ import java.util.Vector;
                 }
             }
         }
+
+       public boolean isChannelConnected(){
+            if(sftp!=null){
+                if(this.sftp.isConnected()){
+                    return true;
+                }
+                return false;
+            }
+            return false;
+       }
 
         /**
          * 单个文件上传
@@ -346,11 +358,15 @@ import java.util.Vector;
             String s= "failed";
             try {
                 s=sftp.pwd();
+                Log.d(TAG,s);
             }catch (SftpException e){
                 e.printStackTrace();
+                Log.d(TAG,"error");
             }
             return s;
         }
+
+
 
         public ArrayList<String> showChildNames(String directory) {
             ArrayList<String> arrs = new ArrayList<String>();

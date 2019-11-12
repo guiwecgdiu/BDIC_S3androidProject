@@ -43,6 +43,8 @@ public class FolderActivity extends AppCompatActivity {
     ArrayList<File> fileList;
     String rootPath;
 
+    static String remotePath;
+    static String localPath;
 
     Stack<String> curPathStack;
 
@@ -59,14 +61,15 @@ public class FolderActivity extends AppCompatActivity {
         fileList=new ArrayList<File>();
         curPathStack = new Stack<String>();
         //rootPath = getFilesDir().getAbsolutePath();
-        rootPath = Environment.getExternalStorageDirectory().toString();
+      //  rootPath = Environment.getExternalStorageDirectory().toString();
+        rootPath=loadLocalFolder().toString();
         Log.d(TAG,rootPath);
         curPathStack.push(rootPath);
 
         //read the file[] of external directory to a file array - in comment
         //now I use the internal directory version
         Log.d(TAG, "Sucessful read external storage with length = "+Environment.getExternalStorageDirectory());
-        File [] files =Environment.getExternalStorageDirectory().listFiles();
+        File [] files =new File(rootPath).listFiles();
         //File[] files = getFilesDir().listFiles();
         ArrayList<File> filesl =new ArrayList<File>();
         for(int i=0;i<files.length;i++){
@@ -92,6 +95,22 @@ public class FolderActivity extends AppCompatActivity {
         powerPermission();
         init();
 
+    }
+
+    protected File loadLocalFolder(){
+        File file = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument");
+        File localFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Local");
+        File remoteFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Remote");
+        if(!file.exists()){
+            file.mkdir();
+            localFolder.mkdir();
+
+            remoteFolder.mkdir();
+
+        }
+        localPath = localFolder.toString();
+        remotePath = remoteFolder.toString();
+        return file;
     }
 
 
