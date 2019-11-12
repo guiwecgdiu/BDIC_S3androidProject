@@ -92,8 +92,10 @@ import java.util.Vector;
                 if(this.sftp.isConnected()){
                     return true;
                 }
+                Log.d(TAG,"line 95");
                 return false;
             }
+            Log.d(TAG,"line 98");
             return false;
        }
 
@@ -344,6 +346,8 @@ import java.util.Vector;
         @SuppressWarnings("rawtypes")
         public Vector listFiles(String directory){
             Vector v =null;
+
+
             try {
                 v =  sftp.ls(directory);
             }catch (SftpException e){
@@ -351,6 +355,9 @@ import java.util.Vector;
             }
                 return v;
             }
+
+
+
 
 
 
@@ -368,16 +375,7 @@ import java.util.Vector;
 
 
 
-        public ArrayList<String> showChildNames(String directory) {
-            ArrayList<String> arrs = new ArrayList<String>();
-            Vector v = listFiles(directory);
-            Enumeration<ChannelSftp.LsEntry> elements = v.elements();
-            while (elements.hasMoreElements()){
-                ChannelSftp.LsEntry ls = elements.nextElement();
-                arrs.add(ls.getFilename());
-            }
-            return arrs;
-        }
+
 
     }
 
