@@ -4,15 +4,18 @@ import android.app.Activity;
 import android.net.wifi.WifiManager;
 import android.nfc.Tag;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapplication.R;
 import com.example.myapplication.SFTPUtilis.SFTPUtils;
@@ -55,7 +58,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     private SFTPUtils sftp;
     private String currentPath;
     private Thread mThread;
-    private boolean hasReadIn30second=false;
+    private Handler subHandler;
+    private Looper myLooper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +81,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 }
                 if(msg.what == DISCONNECT){
                     tCurPath.setText("Disconnect"+"["+sftp.isChannelConnected()+"]");
-                    closeUI();
+                    curPathFiles.clear();
+                    remoteAdaptor.notifyDataSetChanged();
                 }
                 if(msg.what == WAITING){
                     tCurPath.setText("Waiting......");
@@ -85,7 +90,6 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 if(msg.what == LOADDIR){
                     Log.d(TAG,"show dir");
                     remoteAdaptor.notifyDataSetChanged();
-
                     }
             }
         };
@@ -163,12 +167,16 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         //buttonListdirectory.setOnClickListener(this);
         bConnect.setOnClickListener(this);
         bDisconnect.setOnClickListener(this);
-        lRemoteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        lRemoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                return false;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Message message = subHandler.obtainMessage();
+                //message.what=""
+
+                //arno tag
+                message.sendToTarget();
             }
-        });
+        });//Arno TAG
         //buttonCurrentDir.setOnClickListener(this);
         //bDisconnect.setOnClickListener(this);
 
@@ -183,6 +191,18 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             @Override
             public void run() {
                 //这里写入子线程需要做的工作
+                //Those code for trans msg from the main act to the sub act
+
+                Looper.prepare();
+                myLooper=Looper.myLooper();
+                //...
+                subHandler = new Handler() {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        super.handleMessage(msg);
+                        Toast.makeText(SftpMenu.this,"This is sub handler",Toast.LENGTH_LONG);
+                    }
+                };
 
 
                 switch (v.getId()) {
@@ -244,6 +264,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
                     case R.id.disconnect:{
                         sftp.disconnect();
+
                     }
                     break;
 
@@ -265,6 +286,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     default:
                         break;
                 }
+                Looper.loop();
+                Log.d(TAG,"END OF LOOPER");
             }
         }.start();
     }
@@ -289,8 +312,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
     protected void initData(){
         //sftp = new SFTPUtils("SFTP服务器IP", "用户名", "密码");
-       // sftp = new SFTPUtils("119.3.238.156", "siteadmin", "L1l2l3l4");
-        sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
+        sftp = new SFTPUtils("119.3.238.156", "siteadmin", "L1l2l3l4");
+        //sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
         curPathFiles = new ArrayList<String>();
     }
 
@@ -305,7 +328,14 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         }
         return arrs;
     }
+
+    @Override
+    protected void onDestroy() {
+
+        myLooper.quit();//
+        super.onDestroy();
     }
+}
 // Java 获取文件后缀
 //    public static void main(String[] args) {
 //        File file = new File("HelloWorld.java");

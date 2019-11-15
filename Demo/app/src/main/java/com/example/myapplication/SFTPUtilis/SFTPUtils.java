@@ -346,8 +346,6 @@ import java.util.Vector;
         @SuppressWarnings("rawtypes")
         public Vector listFiles(String directory){
             Vector v =null;
-
-
             try {
                 v =  sftp.ls(directory);
             }catch (SftpException e){
@@ -357,6 +355,16 @@ import java.util.Vector;
             }
 
 
+        public boolean cdDeeper(String directory){
+            try{
+                sftp.cd(directory);
+                return true;
+            }catch (SftpException e){
+                e.printStackTrace();
+                return false;
+            }
+
+        }
 
 
 
