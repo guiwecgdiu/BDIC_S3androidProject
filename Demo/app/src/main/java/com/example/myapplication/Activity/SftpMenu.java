@@ -163,7 +163,6 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         //设置控件对应相应函数
         buttonUpLoad.setOnClickListener(this);
         buttonDownLoad.setOnClickListener(this);
-        //buttonListdirectory.setOnClickListener(this);
         bConnect.setOnClickListener(this);
         bDisconnect.setOnClickListener(this);
         lRemoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -177,10 +176,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 message.what=1234;
                 message.sendToTarget();
             }
-        });//Arno TAG
-        //buttonCurrentDir.setOnClickListener(this);
-        //bDisconnect.setOnClickListener(this);
-
+        });
 
     }
 
@@ -334,7 +330,6 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     public ArrayList<String> showChildNames(Vector v) {
         ArrayList<String> arrs = new ArrayList<String>();
 
-//            Log.d(TAG,v.toString());
         Enumeration<ChannelSftp.LsEntry> elements = v.elements();
         while (elements.hasMoreElements()){
             ChannelSftp.LsEntry ls = elements.nextElement();

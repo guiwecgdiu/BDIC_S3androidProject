@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.myapplication.R;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.zip.Inflater;
 
@@ -27,9 +28,23 @@ public class RemoteFileAdaptor extends ArrayAdapter<String> {
         View v = LayoutInflater.from(getContext()).inflate(resourceId,parent,false);
         ImageView imageView = v.findViewById(R.id.iFileIcon);
         TextView textView = v.findViewById(R.id.iFileName);
-        imageView.setImageResource(R.mipmap.folder);
+        if(fileType(fileName)=="folder") {
+            imageView.setImageResource(R.mipmap.folder);
+        }else if(fileType(fileName).length()>0) {
+            imageView.setImageResource(R.mipmap.html);
+        }else{
+            imageView.setImageResource(R.mipmap.folder);
+        }
         textView.setText(fileName);
 
         return v;
     }
+    private String fileType(String fileName) {
+        if (fileName.lastIndexOf(".") != -1 ) {
+            String suffix = fileName.substring(fileName.lastIndexOf(".")).substring(1);
+            return suffix;
+        } else{
+            return "folder";}
+    }
+
 }
