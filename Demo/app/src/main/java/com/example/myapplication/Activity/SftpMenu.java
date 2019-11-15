@@ -82,6 +82,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 if(msg.what == DISCONNECT){
                     tCurPath.setText("Disconnect"+"["+sftp.isChannelConnected()+"]");
                     curPathFiles.clear();
+                    pathStack.clear();
                     remoteAdaptor.notifyDataSetChanged();
                 }
                 if(msg.what == WAITING){
@@ -105,8 +106,6 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     }
     protected void updateData(){
         currentPath = sftp.currentRemotePath();
-    //    Log.d(TAG,"currentPath in update Data is:"+currentPath);
-        //curPathFiles.addAll( sftp.showChildNames(sftp.currentRemotePath()));
     }
 
 
@@ -170,10 +169,12 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         lRemoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Message message = subHandler.obtainMessage();
-                //message.what=""
 
-                //arno tag
+                ListView l = (ListView)parent;
+                String item =(String) l.getAdapter().getItem(position);
+                pathStack.push("/"+item);
+                Message message = subHandler.obtainMessage(2002,item);
+                message.what=1234;
                 message.sendToTarget();
             }
         });//Arno TAG
@@ -192,19 +193,43 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             public void run() {
                 //这里写入子线程需要做的工作
                 //Those code for trans msg from the main act to the sub act
-
                 Looper.prepare();
                 myLooper=Looper.myLooper();
                 //...
                 subHandler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
-                        super.handleMessage(msg);
-                        Toast.makeText(SftpMenu.this,"This is sub handler",Toast.LENGTH_LONG);
+//                        pathStack.push(msg.obj.toString());
+//                        Message m =mHandler.obtainMessage();
+//                        m.what=LOADDIR;
+//                        sftp.cdDeeper(getPathString());
+//
+//                        sftp.listFiles(sftp.currentRemotePath());
+//                        mHandler.sendMessage(m);
+                        if(msg.what == 1234){
+                        Message conncting=Message.obtain();
+                        conncting.what=WAITING;
+                        mHandler.sendMessage(conncting);
+                        Log.d(TAG,"Connect Start");
+                        Log.d(TAG,sftp.currentRemotePath());
+                        // Log.d(TAG,sftp.showChildNames(sftp.currentRemotePath()).toString());
+                        Log.d(TAG,"at 214");
+                       sftp.cdDeeper(getPathString());
+
+                        //wait for a while and then load the files
+                        while (true) {
+                            if(sftp.listFiles(getPathString())!=null) {
+                                Message m = Message.obtain();
+                                m.what = LOADDIR;
+                              //  Log.d(TAG, "Line 238" +sftp.listFiles(currentPath).toString());
+                                curPathFiles.clear();
+                               curPathFiles.addAll(showChildNames(sftp.listFiles(getPathString())));
+                                mHandler.sendMessage(m);
+                                break;
+                            }}
+                        Toast.makeText(SftpMenu.this,msg.obj.toString()+" is clicked",Toast.LENGTH_LONG).show();}
                     }
                 };
-
-
                 switch (v.getId()) {
                     case R.id.button_upload: {
                         //上传文件
@@ -244,6 +269,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                        Log.d(TAG,sftp.currentRemotePath());
                       // Log.d(TAG,sftp.showChildNames(sftp.currentRemotePath()).toString());
                        rootPath=sftp.currentRemotePath();
+                       pathStack.push(rootPath);
 
                         //wait for a while and then load the files
                        while (true) {
@@ -267,22 +293,6 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
                     }
                     break;
-
-//                    case R.id.current_location: {
-//                        sftp.connect();
-//                        Log.d(TAG, "Connect Successful");
-//                        Log.d(TAG, sftp.currentRemotePath());
-//                        sftp.disconnect();
-//                    }
-//                    break;
-//
-//                    case R.id.check_remoteList: {
-//                        sftp.connect();
-//                        Log.d(TAG, "Connect Successful");
-//                        Log.d(TAG, sftp.showChildNames(sftp.currentRemotePath()).toString());
-//                        sftp.disconnect();
-//                    }
-//                    break;
                     default:
                         break;
                 }
@@ -303,6 +313,9 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             return result;
         }
 
+    protected void cd(String directory){
+        sftp.cdDeeper(directory);
+    }
 
     protected void init() {
         initData();
@@ -314,6 +327,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         //sftp = new SFTPUtils("SFTP服务器IP", "用户名", "密码");
         sftp = new SFTPUtils("119.3.238.156", "siteadmin", "L1l2l3l4");
         //sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
+        pathStack = new Stack<String>();
         curPathFiles = new ArrayList<String>();
     }
 
