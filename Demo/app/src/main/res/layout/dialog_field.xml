@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:textSize="24sp"
+        android:typeface="monospace"
+        android:textColor="@android:color/white"
+        android:text="@string/DialogTitle"
+        />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SiteName："
+                style="@style/FieldTextStyle" />
+
+            <EditText
+                android:id="@+id/fSiteName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="CustoName"
+                android:singleLine="true"/>
+        </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:padding="2dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Host IP:"
+                    style="@style/FieldTextStyle" />
+
+                <EditText
+                    android:id="@+id/fHostIp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="http://127.0.0.1:5000/"
+                    android:singleLine="true"/>
+            </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="2dp"
+            android:layout_margin="5dp">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Protocol:"
+                style="@style/FieldTextStyle" />
+
+            <EditText
+                android:id="@+id/fProtocol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Sftp"
+                android:singleLine="true"/>
+        </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:padding="2dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UserName:"
+                    style="@style/FieldTextStyle" />
+
+                <EditText
+                    android:id="@+id/fUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="username"
+                    android:singleLine="true"/>
+
+
+
+            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="2dp"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Passward"
+                style="@style/FieldTextStyle" />
+
+            <EditText
+                android:id="@+id/fPassward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="5 am"
+                android:singleLine="true"/>
+        </LinearLayout>
+        </LinearLayout>
+</ScrollView>
+    </LinearLayout>
+

@@ -1,8 +1,10 @@
 package com.example.myapplication.Activity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.net.wifi.WifiManager;
 import android.nfc.Tag;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -29,6 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
+import android.support.v7.app.AlertDialog;
 
 
 public class SftpMenu extends Activity implements View.OnClickListener {
@@ -60,6 +63,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     private Thread mThread;
     private Handler subHandler;
     private Looper myLooper;
+    private String downLoadPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +181,38 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 message.sendToTarget();
             }
         });
+        lRemoteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final String item = (String)parent.getItemAtPosition(position);
+                AlertDialog aldg;
+                AlertDialog.Builder adBd=new AlertDialog.Builder(SftpMenu.this);
+                adBd.setTitle("My Dialog");
+                adBd.setMessage("Do you want to download this file");
+                adBd.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //finish();
+                        Message msg = Message.obtain(subHandler);
+                        msg.what=888;
+                        Bundle b = new Bundle();
+                        b.putString("fn",item);
+                        msg.setData(b);
+                        msg.sendToTarget();
+                    }
+                });
+                adBd.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                aldg=adBd.create();
+                aldg.show();
+
+                return true;
+            }
+        });
 
     }
 
@@ -224,6 +260,12 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                                 break;
                             }}
                         Toast.makeText(SftpMenu.this,msg.obj.toString()+" is clicked",Toast.LENGTH_LONG).show();}
+                        if(msg.what==888){
+                            String str = msg.getData().getString("fn");
+                           // Log.d(TAG,downLoadPath + "is received at 260");
+                           boolean isSuccess = sftp.downloadFile(currentPath,str,downLoadPath,str);
+                           //Log.d(TAG, "success"+isSuccess +" at 267");
+                        }
                     }
                 };
                 switch (v.getId()) {
@@ -270,6 +312,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                         //wait for a while and then load the files
                        while (true) {
                            if(sftp.listFiles(currentPath)!=null) {
+                               //Log.d(TAG,sftp.listFiles(currentPath).toString());
                                Message msg = Message.obtain();
                                msg.what = LOADDIR;
                                Log.d(TAG, "Line 238" +sftp.listFiles(currentPath).toString());
@@ -325,6 +368,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         //sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
         pathStack = new Stack<String>();
         curPathFiles = new ArrayList<String>();
+        downLoadPath= Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Remote";
     }
 
     public ArrayList<String> showChildNames(Vector v) {
@@ -341,7 +385,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
 
-        myLooper.quit();//
+       // myLooper.quit();//
         super.onDestroy();
     }
 }

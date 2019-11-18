@@ -235,8 +235,8 @@ import java.util.Vector;
         public boolean downloadFile(String remotePath, String remoteFileName,
                                     String localPath, String localFileName) {
             try {
-                sftp.cd(remotePath);
-                File file = new File(localPath + localFileName);
+               // sftp.cd(remotePath);
+                File file = new File(localPath +"/"+ localFileName);
                 mkdirs(localPath + localFileName);
                 sftp.get(remoteFileName, new FileOutputStream(file));
                 return true;

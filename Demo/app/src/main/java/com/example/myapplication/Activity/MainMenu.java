@@ -1,23 +1,34 @@
 package com.example.myapplication.Activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.myapplication.DBStorage.SiteInfoSQLiteOpenHelper;
 import com.example.myapplication.FileUtils.RequestCode;
+import com.example.myapplication.Model.SiteInfo;
 import com.example.myapplication.R;
+import com.example.myapplication.presentation.FieldDialogFragment;
+import com.example.myapplication.presentation.GridAdaptor;
 
-public class MainMenu extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainMenu extends AppCompatActivity implements FieldDialogFragment.FieldDialogCallback {
     final String TAG = "MainMenu";
     /**
      *  2019/11/6
@@ -26,7 +37,10 @@ public class MainMenu extends AppCompatActivity {
      */
     Button gofolder;
     Button goServer;
-
+    Button addServer;
+    GridView gridFile;
+    GridAdaptor gridAdaptor;
+    ArrayList<SiteInfo> siteInfoListArray;
     /*
     * 2019/11/6
     * Set the click listenner
@@ -50,6 +64,12 @@ public class MainMenu extends AppCompatActivity {
                 startActivity(i);
             }
         });
+        addServer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFieldDialog();
+            }
+        });
     }
 
     /*
@@ -63,8 +83,29 @@ public class MainMenu extends AppCompatActivity {
     private void init(){
       goServer=findViewById(R.id.bServer_mainmenu);
       gofolder= findViewById(R.id.bFolder_mainmenu);
+      addServer = findViewById(R.id.baddServer);
+      gridFile = (GridView)findViewById(R.id.bFileGrid);
+        siteInfoListArray =new ArrayList<SiteInfo>();
+      gridAdaptor = new GridAdaptor(this,siteInfoListArray,R.layout.item_grid);
+        gridFile.setAdapter(gridAdaptor);
+
+        siteInfoListArray.addAll(loadDatabase());
+        gridAdaptor.notifyDataSetChanged();
 
 
+    }
+    void showFieldDialog() {
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        Fragment prev = fragmentManager.findFragmentByTag(FieldDialogFragment.FRAGTAG);
+        if (prev != null) {
+            ft.remove(prev);
+        } else {
+            ft.addToBackStack(null);
+        }
+        FieldDialogFragment.newInstance(1).show(getSupportFragmentManager(), FieldDialogFragment.FRAGTAG);
     }
 
 
@@ -82,7 +123,7 @@ public class MainMenu extends AppCompatActivity {
 
 
 
-     //   loadFilelistWithpermission();
+
     }
 
     protected void powerPermission(){
@@ -131,42 +172,7 @@ public class MainMenu extends AppCompatActivity {
         }
     }
 
-//    protected void powerPermission(){
-//        if(  ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)
-//                        !=PackageManager.PERMISSION_GRANTED){
-//            Log.d(TAG,"Line 89: The readExternal is denied");
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-//                    1);
-//        }else{
-//            Log.d(TAG,"line95: The readExternal is granted");
-//        }
-//    }
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//
-//
-//        if (requestCode == 1) {
-//            if(ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED){
-//                Toast.makeText(this,"The read is setted",Toast.LENGTH_LONG);
-//            }else {
-//                //Permission denied
-//                Toast.makeText(this,"The permission is denied",Toast.LENGTH_LONG);
-//            }
-//        }
-//    }
 
-    /**
-     * For each devices with ssdk>23, it need a dynamically permission check
-     * It can be five steps:
-     * Check Platform - Not cluded in this codes
-     * Check the permission - checkSelfPermission.....
-     *If true do process, if No, Explain request to permission  - shouldShow......
-     *          if the should.. be selected with 'don't show again' it return false, else it return true, and give permission disabled to devices
-     * Request the permission - requestthepermission
-     *           It will be called as a callback method by the should...its behaviour base on the user's select
-     * Handle the requst
-     */
 
     protected void  loadFilelistWithpermission(){
         if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)
@@ -182,4 +188,52 @@ public class MainMenu extends AppCompatActivity {
     }
 
 
+
+
+
+    @Override
+    public void doPositiveClick(Bundle bundle) {
+//
+
+        String mHost_ip = bundle.getString(FieldDialogFragment.BHostAddress, "default");
+        String mSite_Name = bundle.getString(FieldDialogFragment.BSiteName, "default");
+        String mProtocol= bundle.getString(FieldDialogFragment.BProtocol, "default");
+         String mUsername= bundle.getString(FieldDialogFragment.BUsername, "default");
+         String mPassward=bundle.getString(FieldDialogFragment.BPassward, "default");
+
+        SiteInfo sf = new SiteInfo(mHost_ip, mSite_Name,mUsername,mPassward);
+        //SQlite test
+        //deleteDatabase(getFilesDir()+"/test.db");
+        addRecord(sf);
+       // Log.d(TAG,loadDatabase().toString());
+    }
+    public void addRecord(SiteInfo info){
+        ArrayList<SiteInfo> temp;
+        SiteInfoSQLiteOpenHelper mHelper = SiteInfoSQLiteOpenHelper.getInstance(this, 2);
+        SQLiteDatabase db = mHelper.openWriteLink();
+        long i = mHelper.insert(info);
+        temp=loadDatabase();
+        Log.d(TAG,"Line 212:"+temp.toString());
+        SiteInfo last = temp.get(temp.size()-1);
+        int id = last.mId;
+        info.setId(id);
+        siteInfoListArray.add(info);
+
+        mHelper.closeLink();
+        gridAdaptor.notifyDataSetChanged();
+    }
+    public ArrayList<SiteInfo> loadDatabase(){
+        SiteInfoSQLiteOpenHelper mHelper = SiteInfoSQLiteOpenHelper.getInstance(this,2);
+        SQLiteDatabase db = mHelper.openWriteLink();
+        ArrayList<SiteInfo> tempArray = mHelper.queryAll();
+        //Log.d(Tag,"Successful load Array with length = "+tempArray.size());
+        mHelper.closeLink();
+        return tempArray;
+    }
+
+
+    @Override
+    public void doNegativeClick() {
+
+    }
 }
