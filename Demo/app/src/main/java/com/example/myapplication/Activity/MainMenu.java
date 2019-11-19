@@ -1,15 +1,18 @@
 package com.example.myapplication.Activity;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,7 +40,6 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
     * @param goServer  serverButton
      */
     Button gofolder;
-    Button goServer;
     Button addServer;
     GridView gridFile;
     GridAdaptor gridAdaptor;
@@ -58,13 +60,6 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
             }
         });
 
-        goServer.setOnClickListener(new View.OnClickListener() {
-            @Override
-        public void onClick(View v) {
-                Intent i= new Intent(MainMenu.this, SftpMenu.class);
-                startActivity(i);
-            }
-        });
         addServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,6 +77,16 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
                 startActivity(i);
             }
         });
+
+        gridFile.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                GridView gridView = (GridView) parent;
+                SiteInfo item = (SiteInfo) gridView.getAdapter().getItem(position);
+                remove(item);
+                return true;
+            }
+        });
     }
 
     /*
@@ -93,7 +98,6 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
 
 
     private void init(){
-      goServer=findViewById(R.id.bServer_mainmenu);
       gofolder= findViewById(R.id.bFolder_mainmenu);
       addServer = findViewById(R.id.baddServer);
       gridFile = (GridView)findViewById(R.id.bFileGrid);
@@ -103,9 +107,9 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
 
         siteInfoListArray.addAll(loadDatabase());
         gridAdaptor.notifyDataSetChanged();
-
-
     }
+
+
     void showFieldDialog() {
         // DialogFragment.show() will take care of adding the fragment
         // in a transaction.  We also want to remove any currently showing
@@ -132,9 +136,6 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         powerPermission();
         init();
         initClickListenner();
-
-
-
 
     }
 
@@ -241,6 +242,39 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         //Log.d(Tag,"Successful load Array with length = "+tempArray.size());
         mHelper.closeLink();
         return tempArray;
+    }
+
+    public boolean remove(final SiteInfo i ){
+        SiteInfoSQLiteOpenHelper mHelper = SiteInfoSQLiteOpenHelper.getInstance(this,2);
+        SQLiteDatabase db = mHelper.openWriteLink();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainMenu.this);
+        builder.setMessage("Are you sure to remove");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteItem(i);
+                //Log.d(Tag, "deleteItem(item);");
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.create().show();
+        //Avoid response the both click, consume the request here by returning true
+        return true;
+    }
+
+    private void deleteItem(SiteInfo siteInfo){
+        SiteInfoSQLiteOpenHelper mHelper = SiteInfoSQLiteOpenHelper.getInstance(this,2);
+        SQLiteDatabase DB = mHelper.openWriteLink();
+        int id = mHelper.deleteSiteInfo(siteInfo);
+        siteInfoListArray.remove(siteInfo);
+        mHelper.closeLink();
+        gridAdaptor.notifyDataSetChanged();
     }
 
 

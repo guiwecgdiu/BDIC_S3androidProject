@@ -14,15 +14,9 @@
         android:id="@+id/bFolder_mainmenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Folder"
+        android:text="Download"
          />
 
-    <Button
-        android:id="@+id/bServer_mainmenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Server"
-        />
     <Button
         android:id="@+id/baddServer"
         android:layout_width="wrap_content"
@@ -30,18 +24,34 @@
         android:text="addSite"
         />
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <ImageView
+        android:layout_height="match_parent"
+        android:layout_width="100dp"
+        android:src="@mipmap/ic_ftplauncher"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="On the Clound"
+        android:typeface="monospace"
+        android:textSize="20dp"
+        />
 
+    </LinearLayout>
     <GridView
         android:id="@+id/bFileGrid"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="300dp"
         android:columnWidth="100dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
         android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="auto_fit"
         android:padding="20dp"
-        />
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp"
+        android:scrollbarAlwaysDrawVerticalTrack="true"/>
 
     </LinearLayout>

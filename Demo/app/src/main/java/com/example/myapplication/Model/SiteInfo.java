@@ -6,14 +6,7 @@ import java.io.Serializable;
 
 public class SiteInfo implements Serializable {
     //public int mId=-1;public static String DID = "_id";
-    public String mMooduleCode;public static String DBCODE = "moodule_code";
-    public String mMooduleName;public static String DBNAME = "moodule_name";
-    public String mChoice;public static String DBCHOICE = "first_letter";
-    public String mDayofWeek;public static String DBDAYOFWEEK = "day_indecation";
-    public String mStartTime;public static String DBSTARTTIME = "start_time";
-    public String mLocation;public static String DBLOCATION = "location";
-    public String mComment;public static String DBCOMMENT = "comments";
-    public static String Serializable = "FULLINFO";
+
 
 
     public int mId=-1;public static String DID = "_id";
@@ -35,15 +28,7 @@ public class SiteInfo implements Serializable {
         mUsername = username;
         mPassward = passward;
     }
-    public SiteInfo(String code, String name, String choice, String dayOfweek, String startTime, String location, String comment){
-        mMooduleCode = code;
-        mMooduleName = name;
-        mChoice = choice;
-        mDayofWeek = dayOfweek;
-        mStartTime = startTime;
-        mLocation = location;
-        mComment = comment;
-    }
+
 
 
 

@@ -113,7 +113,7 @@ import java.util.Vector;
             try {
                 createDir(remotePath);
                 System.out.println(remotePath);
-                File file = new File(localPath + localFileName);
+                File file = new File(localPath + "/"+localFileName);
                 in = new FileInputStream(file);
                 System.out.println(in);
                 sftp.put(in, remoteFileName);
@@ -142,32 +142,7 @@ import java.util.Vector;
          * @param del
          * @return
          */
-        public boolean bacthUploadFile(String remotePath, String localPath,
-                                       boolean del) {
-            try {
-                File file = new File(localPath);
-                File[] files = file.listFiles();
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].isFile()
-                            && files[i].getName().indexOf("bak") == -1) {
-                        synchronized(remotePath){
-                            if (this.uploadFile(remotePath, files[i].getName(),
-                                    localPath, files[i].getName())
-                                    && del) {
-                                deleteFile(localPath + files[i].getName());
-                            }
-                        }
-                    }
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                this.disconnect();
-            }
-            return false;
 
-        }
 
         /**
          * 批量下载文件
@@ -182,47 +157,7 @@ import java.util.Vector;
          *            下载后是否删除sftp文件
          * @return
          */
-        @SuppressWarnings("rawtypes")
-        public boolean batchDownLoadFile(String remotPath, String localPath,
-                                         String fileFormat, boolean del) {
-            try {
-                connect();
-                Vector v = listFiles(remotPath);
-                if (v.size() > 0) {
 
-                    Iterator it = v.iterator();
-                    while (it.hasNext()) {
-                        ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) it.next();
-                        String filename = entry.getFilename();
-                        SftpATTRS attrs = entry.getAttrs();
-                        if (!attrs.isDir()) {
-                            if (fileFormat != null && !"".equals(fileFormat.trim())) {
-                                if (filename.startsWith(fileFormat)) {
-                                    if (this.downloadFile(remotPath, filename,
-                                            localPath, filename)
-                                            && del) {
-                                        deleteSFTP(remotPath, filename);
-                                    }
-                                }
-                            } else {
-                                if (this.downloadFile(remotPath, filename,
-                                        localPath, filename)
-                                        && del) {
-                                    deleteSFTP(remotPath, filename);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-//            catch (SftpException e) {
-//                e.printStackTrace();
-//            }
-           finally {
-                this.disconnect();
-            }
-            return false;
-        }
 
         /**
          * 单个文件下载

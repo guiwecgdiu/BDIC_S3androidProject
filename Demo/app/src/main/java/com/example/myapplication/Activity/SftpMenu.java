@@ -49,8 +49,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     private final int WAITING = 000;
     private final int CDTODIR=1234;
     private final int DOWNLOAD=888;
+    private final int DOWNLOADVERIFY = 002;
     private Button buttonUpLoad = null;
-    private Button buttonDownLoad = null;
     private Button bConnect = null;
     private Button bDisconnect = null;
     private ListView lRemoteList;
@@ -68,6 +68,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     private Looper myLooper;
     private String downLoadPath;
     private SiteInfo siteInfo;
+    private boolean Isconnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +79,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         init();
         startConnectCheckThread();
     }
-
+    //UI handler receive data and update UI
     protected void makeHandler(){
         mHandler = new Handler(){
             @Override
@@ -92,7 +93,9 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     tCurPath.setText("Disconnect"+"["+sftp.isChannelConnected()+"]");
                     curPathFiles.clear();
                     pathStack.clear();
+                    buttonUpLoad.setVisibility(Button.GONE);
                     remoteAdaptor.notifyDataSetChanged();
+                    Isconnect=false;
                 }
                 if(msg.what == WAITING){
                     tCurPath.setText("Waiting......");
@@ -100,7 +103,12 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 if(msg.what == LOADDIR){
                     Log.d(TAG,"show dir");
                     remoteAdaptor.notifyDataSetChanged();
+                    Toast.makeText(SftpMenu.this,"Cd to"+currentPath,Toast.LENGTH_LONG).show();
                     }
+                if(msg.what == DOWNLOADVERIFY){
+                    Log.d(TAG,"Here");
+                    Toast.makeText(SftpMenu.this,msg.obj.toString(),Toast.LENGTH_LONG).show();
+                }
             }
         };
     }
@@ -119,11 +127,14 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     }
     protected void updateUI(){
         tCurPath.setText(currentPath+"["+sftp.isChannelConnected()+"]");
+        buttonUpLoad.setVisibility(Button.VISIBLE);
 
 
     }
+
     protected void updateData(){
         currentPath = sftp.currentRemotePath();
+        Isconnect = true;
     }
 
 
@@ -143,7 +154,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     }catch (InterruptedException e){
                         e.printStackTrace();
                     }
-
+                    //This thread is a observer
+                        //detect is connecting....
                         if(sftp.isChannelConnected() == true)
                         {
                             Log.d(TAG,"Current path is"+sftp.currentRemotePath());//important without pwd can't read
@@ -152,11 +164,10 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                         mHandler.sendMessage(msg);
                         }else {
                             Message msg =Message.obtain();
-                        msg.what = DISCONNECT;
+                            msg.what = DISCONNECT;
                             mHandler.sendMessage(msg);
                         }
-
-                        }
+                }
                     }
 
         });
@@ -167,7 +178,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         Log.d(TAG,"Init");
         //获取控件对象
         buttonUpLoad = (Button) findViewById(R.id.button_upload);
-        buttonDownLoad = (Button) findViewById(R.id.button_download);
+        buttonUpLoad.setVisibility(Button.GONE);
         bConnect = findViewById(R.id.connect);
         bDisconnect = findViewById(R.id.disconnect);
         tCurPath=findViewById(R.id.serverPath);
@@ -177,10 +188,16 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         remoteAdaptor = new RemoteFileAdaptor(this,R.layout.item_type1,curPathFiles);
         lRemoteList.setAdapter(remoteAdaptor);
     }
+
+    public void toParenTorChild(String item){
+        pathStack.push("/"+item);
+        Message message = subHandler.obtainMessage(CDTODIR,item);
+        message.what=CDTODIR;
+        message.sendToTarget();
+    }
     public void initListener(){
         //设置控件对应相应函数
         buttonUpLoad.setOnClickListener(this);
-        buttonDownLoad.setOnClickListener(this);
         bConnect.setOnClickListener(this);
         bDisconnect.setOnClickListener(this);
         lRemoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -189,10 +206,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
                 ListView l = (ListView)parent;
                 String item =(String) l.getAdapter().getItem(position);
-                pathStack.push("/"+item);
-                Message message = subHandler.obtainMessage(CDTODIR,item);
-                message.what=CDTODIR;
-                message.sendToTarget();
+                toParenTorChild(item);
             }
         });
         lRemoteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -207,6 +221,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //finish();
+                        Toast.makeText(SftpMenu.this,"Start DownLoad",Toast.LENGTH_LONG).show();
                         Message msg = Message.obtain(subHandler);
                         msg.what=DOWNLOAD;
                         Bundle b = new Bundle();
@@ -230,6 +245,20 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
     }
 
+    protected void updateDir(){
+        while (true) {
+            if(sftp.listFiles(getPathString())!=null) {
+                Message m = Message.obtain();
+                m.what = LOADDIR;
+                //update the current listview
+                //Use LoadDIR MSG to update UI
+                curPathFiles.clear();
+                curPathFiles.addAll(showChildNames(sftp.listFiles(getPathString())));
+                mHandler.sendMessage(m);
+                break;
+            }
+        }
+    }
     @Override
     public void onClick(final View v) {
         // TODO Auto-generated method stub
@@ -245,69 +274,46 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 subHandler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
-//                        pathStack.push(msg.obj.toString());
-//                        Message m =mHandler.obtainMessage();
-//                        m.what=LOADDIR;
-//                        sftp.cdDeeper(getPathString());
-//
-//                        sftp.listFiles(sftp.currentRemotePath());
-//                        mHandler.sendMessage(m);
-                        if(msg.what == CDTODIR){
-                        Message conncting=Message.obtain();
-                        conncting.what=WAITING;
-                        mHandler.sendMessage(conncting);
-                        Log.d(TAG,"Connect Start");
-                        Log.d(TAG,sftp.currentRemotePath());
-                        // Log.d(TAG,sftp.showChildNames(sftp.currentRemotePath()).toString());
-                        Log.d(TAG,"at 214");
-                       sftp.cdDeeper(getPathString());
-
-                        //wait for a while and then load the files
-                        while (true) {
-                            if(sftp.listFiles(getPathString())!=null) {
-                                Message m = Message.obtain();
-                                m.what = LOADDIR;
-                              //  Log.d(TAG, "Line 238" +sftp.listFiles(currentPath).toString());
-                                curPathFiles.clear();
-                               curPathFiles.addAll(showChildNames(sftp.listFiles(getPathString())));
-                                mHandler.sendMessage(m);
-                                break;
-                            }}
-                        Toast.makeText(SftpMenu.this,msg.obj.toString()+" is clicked",Toast.LENGTH_LONG).show();}
-                        if(msg.what==DOWNLOAD){
-                            String str = msg.getData().getString("fn");
-                           // Log.d(TAG,downLoadPath + "is received at 260");
-                           boolean isSuccess = sftp.downloadFile(currentPath,str,downLoadPath,str);
-                           //Log.d(TAG, "success"+isSuccess +" at 267");
+                        //cd Directory, trigger by click a remote file..go deeper
+                        if(msg.what == CDTODIR)
+                        {
+                            Message conncting=Message.obtain();
+                            conncting.what=WAITING;
+                            mHandler.sendMessage(conncting);
+                            Log.d(TAG,sftp.currentRemotePath());
+                            // Log.d(TAG,sftp.showChildNames(sftp.currentRemotePath()).toString());
+                            sftp.cdDeeper(getPathString());
+                        //wait for a while until the list file is not false then load the files
+                                updateDir();
                         }
+                            if(msg.what==DOWNLOAD){
+                                Log.d(TAG,"line276");
+                                String str = msg.getData().getString("fn");
+                                // Log.d(TAG,downLoadPath + "is received at 260");
+                                boolean isSuccess = sftp.downloadFile(currentPath,str,downLoadPath,str);
+
+                                Log.d(TAG,isSuccess+"line276");
+                                Message downloadVerify;
+                                if(isSuccess == true){
+                                     downloadVerify = Message.obtain(mHandler);
+                                     downloadVerify.obj="Download Successed :]";
+                                 }else{
+                                    downloadVerify = Message.obtain(mHandler);
+                                    downloadVerify.obj="Download Failed, try again plz :[";
+                                 }
+                                    downloadVerify.what=DOWNLOADVERIFY;
+                                downloadVerify.sendToTarget();
+                                }
                     }
                 };
                 switch (v.getId()) {
                     case R.id.button_upload: {
                         //上传文件
                         Log.d(TAG, "上传文件");
-                        String localPath = "sdcard/xml/";
-                        String remotePath = "test";
-                        sftp.connect();
-                        Log.d(TAG, "连接成功");
-                        sftp.uploadFile(remotePath, "APPInfo.xml", localPath, "APPInfo.xml");
-                        Log.d(TAG, "上传成功");
-                        sftp.disconnect();
-                        Log.d(TAG, "断开连接");
-                    }
-                    break;
 
-                    case R.id.button_download: {
-                        //下载文件
-                        Log.d(TAG, "下载文件");
-                        String localPath = "sdcard/download/";
-                        String remotePath = "test";
-                        sftp.connect();
-                        Log.d(TAG, "连接成功");
-                        sftp.downloadFile(remotePath, "APPInfo.xml", localPath, "APPInfo.xml");
-                        Log.d(TAG, "下载成功");
-                        sftp.disconnect();
-                        Log.d(TAG, "断开连接");
+
+                        sftp.uploadFile(currentPath, "wall.gif", downLoadPath, "wall.gif");
+                        updateDir();
 
                     }
                     break;
@@ -383,6 +389,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         pathStack = new Stack<String>();
         curPathFiles = new ArrayList<String>();
         downLoadPath= Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Remote";
+        Isconnect = false;
     }
 
     public ArrayList<String> showChildNames(Vector v) {
@@ -401,6 +408,20 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
        // myLooper.quit();//
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        exit();
+    }
+
+    protected void exit(){
+        if(Isconnect){
+            toParenTorChild("..");
+        }else{
+            finish();
+        }
+
     }
 }
 // Java 获取文件后缀
