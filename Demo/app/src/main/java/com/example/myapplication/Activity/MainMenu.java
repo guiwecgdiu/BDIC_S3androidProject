@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
@@ -68,6 +69,17 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
             @Override
             public void onClick(View v) {
                 showFieldDialog();
+            }
+        });
+        gridFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GridView gridView = (GridView) parent;
+                SiteInfo item = (SiteInfo) gridView.getAdapter().getItem(position);
+                Intent i = new Intent(MainMenu.this,SftpMenu.class);
+                Bundle b =new Bundle();
+                i.putExtra("siteInfo",item);
+                startActivity(i);
             }
         });
     }

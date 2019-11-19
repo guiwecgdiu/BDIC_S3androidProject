@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.Model.SiteInfo;
 import com.example.myapplication.R;
 import com.example.myapplication.SFTPUtilis.SFTPUtils;
 import com.example.myapplication.presentation.RemoteFileAdaptor;
@@ -46,6 +47,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     private final int DISCONNECT = 404;
     private final int LOADDIR = 001;
     private final int WAITING = 000;
+    private final int CDTODIR=1234;
+    private final int DOWNLOAD=888;
     private Button buttonUpLoad = null;
     private Button buttonDownLoad = null;
     private Button bConnect = null;
@@ -64,12 +67,14 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     private Handler subHandler;
     private Looper myLooper;
     private String downLoadPath;
+    private SiteInfo siteInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sftpmain);
         makeHandler();
+        generateSftp();
         init();
         startConnectCheckThread();
     }
@@ -98,6 +103,15 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     }
             }
         };
+    }
+
+    protected void generateSftp(){
+        siteInfo = (SiteInfo)getIntent().getSerializableExtra("siteInfo");
+        //sftp = new SFTPUtils("SFTP服务器IP", "用户名", "密码");
+        //sftp = new SFTPUtils("119.3.238.156", "siteadmin", "L1l2l3l4");
+        sftp = new SFTPUtils(siteInfo.mHost_ip, siteInfo.mUsername, siteInfo.mPassward);
+        //sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
+
     }
     protected void closeUI(){
         curPathFiles.clear();
@@ -176,8 +190,8 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 ListView l = (ListView)parent;
                 String item =(String) l.getAdapter().getItem(position);
                 pathStack.push("/"+item);
-                Message message = subHandler.obtainMessage(2002,item);
-                message.what=1234;
+                Message message = subHandler.obtainMessage(CDTODIR,item);
+                message.what=CDTODIR;
                 message.sendToTarget();
             }
         });
@@ -194,7 +208,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     public void onClick(DialogInterface dialog, int which) {
                         //finish();
                         Message msg = Message.obtain(subHandler);
-                        msg.what=888;
+                        msg.what=DOWNLOAD;
                         Bundle b = new Bundle();
                         b.putString("fn",item);
                         msg.setData(b);
@@ -238,7 +252,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 //
 //                        sftp.listFiles(sftp.currentRemotePath());
 //                        mHandler.sendMessage(m);
-                        if(msg.what == 1234){
+                        if(msg.what == CDTODIR){
                         Message conncting=Message.obtain();
                         conncting.what=WAITING;
                         mHandler.sendMessage(conncting);
@@ -260,7 +274,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                                 break;
                             }}
                         Toast.makeText(SftpMenu.this,msg.obj.toString()+" is clicked",Toast.LENGTH_LONG).show();}
-                        if(msg.what==888){
+                        if(msg.what==DOWNLOAD){
                             String str = msg.getData().getString("fn");
                            // Log.d(TAG,downLoadPath + "is received at 260");
                            boolean isSuccess = sftp.downloadFile(currentPath,str,downLoadPath,str);
@@ -363,9 +377,9 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     }
 
     protected void initData(){
-        //sftp = new SFTPUtils("SFTP服务器IP", "用户名", "密码");
-        sftp = new SFTPUtils("119.3.238.156", "siteadmin", "L1l2l3l4");
-        //sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
+//        //sftp = new SFTPUtils("SFTP服务器IP", "用户名", "密码");
+//        sftp = new SFTPUtils("119.3.238.156", "siteadmin", "L1l2l3l4");
+//        //sftp=new SFTPUtils("47.103.117.157","siteadmin","guiwecgdiu");
         pathStack = new Stack<String>();
         curPathFiles = new ArrayList<String>();
         downLoadPath= Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Remote";
