@@ -96,6 +96,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     buttonUpLoad.setVisibility(Button.GONE);
                     remoteAdaptor.notifyDataSetChanged();
                     Isconnect=false;
+                    bConnect.setVisibility(Button.VISIBLE);
                 }
                 if(msg.what == WAITING){
                     tCurPath.setText("Waiting......");
@@ -128,6 +129,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     protected void updateUI(){
         tCurPath.setText(currentPath+"["+sftp.isChannelConnected()+"]");
         buttonUpLoad.setVisibility(Button.VISIBLE);
+        bConnect.setVisibility(Button.GONE);
 
 
     }
