@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.FileUtils.FileUtils;
 import com.example.myapplication.FileUtils.RequestCode;
 import com.example.myapplication.R;
 import com.example.myapplication.presentation.FileAdaptor;
@@ -135,24 +136,36 @@ public class FolderActivity extends AppCompatActivity {
                 File itemf = (File) parent.getAdapter().getItem(position);
                 String name = itemf.getName();
                 Log.d(TAG,name+"is clcked");
-                curPathStack.push("/"+name);
-                showChange(getPathString());
+                if(FileUtils.fileType(name) == "folder") {
+                    curPathStack.push("/" + name);
+                    showChange(getPathString());
+                }else{
+
+                    //Toast.makeText(FolderActivity.this,"It doesn't has children folder",Toast.LENGTH_LONG).show();
+                    operateFile(name,getPathString());
+                }
             }
         });
     }
 
+    public void operateFile(String fileName,String pathName){
+        Toast.makeText(FolderActivity.this,"File:"+fileName + " locate: under "+pathName,Toast.LENGTH_LONG).show();
+    }
+
+
+
+
+
     protected void showChange(String path){
         Log.d(TAG,path);
         File [] files = new File(path).listFiles();
-        if(files!=null) {
+
             fileList.clear();
             for (int i = 0; i < files.length; i++) {
                 fileList.add(files[i]);
             }
-        }else {
-            Toast.makeText(this,"It doesn't has children folder",Toast.LENGTH_LONG).show();
-            curPathStack.pop();
-        }
+
+
         fad.notifyDataSetChanged();
         tCurPath.setText(getPathString());
     }

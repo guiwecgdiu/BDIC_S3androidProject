@@ -22,8 +22,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.FolderActivity" android:label="FolderActvity"/>
-        <activity android:name=".Activity.SftpMenu" android:label="SftpMenu">
-        </activity>
+        <activity android:name=".Activity.SftpMenu" android:label="SftpMenu"/>
+        <activity android:name=".Activity.SelectActivity" android:label="SelectUploadFile"/>
+
     </application>
 
 </manifest>

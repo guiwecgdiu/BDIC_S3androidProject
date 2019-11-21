@@ -28,6 +28,14 @@ public class FileUtils {
             return "-"+"f";
         }
         }
+
+    public static String fileType(String fileName) {
+        if (fileName.lastIndexOf(".") != -1 ) {
+            String suffix = fileName.substring(fileName.lastIndexOf(".")).substring(1);
+            return suffix;
+        } else{
+            return "folder";}
+    }
 }
 
 //This class is used to store some code
