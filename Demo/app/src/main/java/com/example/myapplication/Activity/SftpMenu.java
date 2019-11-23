@@ -89,10 +89,30 @@ public class SftpMenu extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sftpmain);
+        validInternet();
         init();
     }
 
+    protected void validInternet(){
+        AlertDialog aldg;
+        AlertDialog.Builder adBd=new AlertDialog.Builder(SftpMenu.this);
+        adBd.setTitle("Internet Checker");
+        adBd.setMessage("Do you have a valid internet connection?");
+        adBd.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
+            }
+        });
+        adBd.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        aldg=adBd.create();
+        aldg.show();
+    }
 
     //UI handler receive data and update UI
     protected void UIUpdateHandler(){
@@ -372,9 +392,10 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                         uiHandler.sendMessage(conncting);
                         Log.d(TAG,"Connect Start");
                        rootPath=sftp.currentRemotePath();
-                       pathStack.push(rootPath);
-                       updateDir();
-                    }
+                            pathStack.push(rootPath);
+                            updateDir();
+
+                       }
                     break;
 
                     case R.id.disconnect:{

@@ -4,4 +4,7 @@
     <string name="dismiss">Dismiss</string>
     <string name="save">Save</string>
     <string name="DialogTitle">Course</string>
+
+
+    <string name="sitenav">Clound Server</string>
 </resources>

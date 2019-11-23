@@ -305,10 +305,10 @@ import java.util.Vector;
 
 
         public String currentRemotePath(){
-            String s= "failed";
+            String s= "Failed";
             try {
-                s=sftp.pwd();
-                Log.d(TAG,s);
+                    s = sftp.pwd();
+                    Log.d(TAG, s);
             }catch (SftpException e){
                 e.printStackTrace();
                 Log.d(TAG,"error");

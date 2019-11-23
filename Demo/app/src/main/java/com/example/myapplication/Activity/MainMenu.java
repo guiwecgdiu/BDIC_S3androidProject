@@ -27,6 +27,7 @@ import com.example.myapplication.DBStorage.SiteInfoSQLiteOpenHelper;
 import com.example.myapplication.FileUtils.RequestCode;
 import com.example.myapplication.Model.SiteInfo;
 import com.example.myapplication.R;
+import com.example.myapplication.Test;
 import com.example.myapplication.presentation.FieldDialogFragment;
 import com.example.myapplication.presentation.GridAdaptor;
 
@@ -281,5 +282,10 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
     @Override
     public void doNegativeClick() {
 
+    }
+
+    public void test(View view) {
+        Intent i= new Intent(this, Test.class);
+        startActivity(i);
     }
 }

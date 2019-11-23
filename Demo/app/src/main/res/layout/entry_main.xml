@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frame_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F3F3"
+    >
+
+    <include layout="@layout/toolbar" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/sitenav"
+        android:layout_marginTop="55dp"
+        android:clickable="true"
+        android:textSize="15sp"
+        android:gravity="center_vertical"
+        android:paddingLeft="17dp"
+        android:background="@drawable/rectangle"/>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="130dp"
+        android:background="@android:color/white"
+        ></android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="250dp"
+        android:layout_marginTop="300dp"
+        android:textSize="15sp"
+        android:text="Last used"
+      />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="300dp"
+        android:layout_marginLeft="17dp"
+        android:textSize="15sp"
+        android:text="Local-Folder"
+        />
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="310dp"
+        android:layout_marginTop="295dp"
+        android:src="@mipmap/ic_arrow_upward" />
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="360dp"
+        android:columnWidth="170dp"
+        android:numColumns="2"
+
+        android:paddingHorizontal="10dp"></GridView>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="55dp"
+        android:layout_marginLeft="258dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:background="@drawable/rectangle">
+
+        <ImageView
+            android:layout_width="33dp"
+            android:layout_height="33dp"
+            android:src="@mipmap/ic_add" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="new Site"
+            android:textSize="15sp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
