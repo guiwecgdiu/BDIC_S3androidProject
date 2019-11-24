@@ -15,12 +15,19 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.DBStorage.SiteInfoSQLiteOpenHelper;
@@ -30,6 +37,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.Test;
 import com.example.myapplication.presentation.FieldDialogFragment;
 import com.example.myapplication.presentation.GridAdaptor;
+import com.example.myapplication.presentation.SiteInfoAdapter;
 
 import java.util.ArrayList;
 
@@ -41,9 +49,11 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
     * @param goServer  serverButton
      */
     Button gofolder;
-    Button addServer;
-    GridView gridFile;
-    GridAdaptor gridAdaptor;
+    LinearLayout addServer;
+ //   GridView gridFile;
+    RecyclerView siteView;
+  //  GridAdaptor gridAdaptor;
+    SiteInfoAdapter siteAdapter;
     ArrayList<SiteInfo> siteInfoListArray;
     /*
     * 2019/11/6
@@ -67,25 +77,41 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
                 showFieldDialog();
             }
         });
-        gridFile.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//        siteAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                GridView gridView = (GridView) parent;
+//                SiteInfo item = (SiteInfo) gridView.getAdapter().getItem(position);
+//                Intent i = new Intent(MainMenu.this,SftpMenu.class);
+//                Bundle b =new Bundle();
+//                i.putExtra("siteInfo",item);
+//                startActivity(i);
+//            }
+//        });
+//
+//        siteView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                GridView gridView = (GridView) parent;
+//                SiteInfo item = (SiteInfo) gridView.getAdapter().getItem(position);
+//                remove(item);
+//                return true;
+//            }
+//        });//xxxx
+        siteAdapter.setOnItemClickListener(new SiteInfoAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GridView gridView = (GridView) parent;
-                SiteInfo item = (SiteInfo) gridView.getAdapter().getItem(position);
+            public void onItemClick(View view, int position) {
+                SiteInfo item = (SiteInfo) siteAdapter.getItem(position);
                 Intent i = new Intent(MainMenu.this,SftpMenu.class);
                 Bundle b =new Bundle();
                 i.putExtra("siteInfo",item);
                 startActivity(i);
             }
-        });
 
-        gridFile.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                GridView gridView = (GridView) parent;
-                SiteInfo item = (SiteInfo) gridView.getAdapter().getItem(position);
+            public void onItemLongClick(View view, int position) {
+                SiteInfo item = (SiteInfo) siteAdapter.getItem(position);
                 remove(item);
-                return true;
             }
         });
     }
@@ -101,13 +127,23 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
     private void init(){
       gofolder= findViewById(R.id.bFolder_mainmenu);
       addServer = findViewById(R.id.baddServer);
-      gridFile = (GridView)findViewById(R.id.bFileGrid);
+      //gridFile = (GridView)findViewById(R.id.bFileGrid);
+        siteView = (RecyclerView) findViewById(R.id.siteinfoView);
         siteInfoListArray =new ArrayList<SiteInfo>();
-      gridAdaptor = new GridAdaptor(this,siteInfoListArray,R.layout.item_grid);
-        gridFile.setAdapter(gridAdaptor);
 
+       // gridFile.setAdapter(gridAdaptor);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        siteView.setLayoutManager(layoutManager);
+       siteAdapter = new SiteInfoAdapter(siteInfoListArray);
+        siteView.setAdapter(siteAdapter);
+        siteView.setFocusableInTouchMode(false);
         siteInfoListArray.addAll(loadDatabase());
-        gridAdaptor.notifyDataSetChanged();
+        siteAdapter.notifyDataSetChanged();
+
+        //xxxx
     }
 
 
@@ -133,7 +169,8 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu);
+        //setContentView(R.layout.activity_main_menu);
+        setContentView(R.layout.entry_main);
         powerPermission();
         init();
         initClickListenner();
@@ -188,19 +225,6 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
 
 
 
-    protected void  loadFilelistWithpermission(){
-        if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)
-        {
-
-
-        }else {
-            if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Toast.makeText(this,"In my app, the permission is needed",Toast.LENGTH_LONG).show();
-            }
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RequestCode.REQUEST_WESTORAGE);
-        }
-    }
-
 
 
 
@@ -234,7 +258,8 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         siteInfoListArray.add(info);
 
         mHelper.closeLink();
-        gridAdaptor.notifyDataSetChanged();
+        siteAdapter.notifyDataSetChanged();//xxx
+        siteView.scrollToPosition(siteAdapter.getItemCount());
     }
     public ArrayList<SiteInfo> loadDatabase(){
         SiteInfoSQLiteOpenHelper mHelper = SiteInfoSQLiteOpenHelper.getInstance(this,2);
@@ -275,7 +300,8 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         int id = mHelper.deleteSiteInfo(siteInfo);
         siteInfoListArray.remove(siteInfo);
         mHelper.closeLink();
-        gridAdaptor.notifyDataSetChanged();
+        siteAdapter.notifyDataSetChanged();//xx
+
     }
 
 

@@ -7,6 +7,7 @@
     android:background="#F3F3F3"
     >
 
+
     <include layout="@layout/toolbar" />
     <TextView
         android:layout_width="match_parent"
@@ -19,10 +20,10 @@
         android:paddingLeft="17dp"
         android:background="@drawable/rectangle"/>
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/siteinfoView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="130dp"
-        android:background="@android:color/white"
+        android:layout_height="170dp"
+        android:layout_marginTop="100dp"
         ></android.support.v7.widget.RecyclerView>
 
     <TextView
@@ -57,25 +58,60 @@
 
         android:paddingHorizontal="10dp"></GridView>
     <LinearLayout
+        android:id="@+id/baddServer"
+        android:contextClickable="true"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginTop="55dp"
         android:layout_marginLeft="258dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:clickable="true"
         android:background="@drawable/rectangle">
 
-        <ImageView
-            android:layout_width="33dp"
-            android:layout_height="33dp"
-            android:src="@mipmap/ic_add" />
-        <TextView
+            <ImageView
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:src="@mipmap/ic_add" />
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="new Site"
+                android:textSize="15sp"/>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/bFolder_mainmenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="new Site"
-            android:textSize="15sp"/>
+            android:text="Download"
+            />
+
+        <Button
+            android:id="@+id/test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="goTest"
+            android:onClick="test"
+            />
 
     </LinearLayout>
 
 </RelativeLayout>
+
+
+<!--<Button-->
+<!--android:id="@+id/baddServer"-->
+<!--android:layout_width="wrap_content"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:text="goTest"-->
+<!--android:onClick="test"-->
+    <!--/>-->

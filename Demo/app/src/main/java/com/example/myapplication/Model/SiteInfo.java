@@ -43,6 +43,13 @@ public class SiteInfo implements Serializable {
     public void setId(int id){
         mId=id;
     }
-
-
+    public String getName(){
+        return mSite_Name;
+    }
+    public String getmHost_ip(){
+        return mHost_ip;
+    }
+    public String getUsername(){
+        return mUsername;
+    }
 }
