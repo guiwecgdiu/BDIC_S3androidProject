@@ -148,6 +148,8 @@ public class FolderActivity extends AppCompatActivity {
         });
     }
 
+
+
     public void operateFile(String fileName,String pathName){
         Toast.makeText(FolderActivity.this,"File:"+fileName + " locate: under "+pathName,Toast.LENGTH_LONG).show();
     }
