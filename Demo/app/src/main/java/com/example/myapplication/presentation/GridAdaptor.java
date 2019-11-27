@@ -4,30 +4,33 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.myapplication.Model.SiteInfo;
 import com.example.myapplication.R;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GridAdaptor extends BaseAdapter {
-    private ArrayList<SiteInfo> mFileList = new ArrayList<SiteInfo>();
+    private ArrayList<File> mFileList;
     private LayoutInflater mInflater;
     private Context mContext;
-    private int mResource;
 
-    public GridAdaptor(Context context, ArrayList<SiteInfo> siteInfoList,int resource){
+    public GridAdaptor(Context context, ArrayList<File> folderList){
         mContext = context;
-        mFileList = siteInfoList;
-        mResource = resource;
+        mFileList = folderList;
         mInflater=LayoutInflater.from(mContext);
     }
 
@@ -55,16 +58,30 @@ public class GridAdaptor extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-            convertView=mInflater.inflate(mResource,null);
-            TextView hostName = convertView.findViewById(R.id.grid_hostname);
-            TextView ipAddress = convertView.findViewById(R.id.grid_ip_address);
-            hostName.setBackgroundColor(Color.BLUE);
-            SiteInfo siteinfo = (SiteInfo)getItem(position);
-            hostName.setText(siteinfo.mSite_Name);
-            hostName.setBackgroundResource(R.mipmap.folder);
-            ipAddress.setText(siteinfo.mHost_ip);
 
+        convertView=mInflater.inflate(R.layout.item_grid,null);
+        TextView folder_name = convertView.findViewById(R.id.folderName);
+        ImageView imgview=convertView.findViewById(R.id.folderIcon);
+        ImageView vertical_three = convertView.findViewById(R.id.vert_three);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(400,105);
+        params.setMargins(400,60,0,0);
+      //  vertical_three.setLayoutParams(new LinearLayout.LayoutParams(105, 85));
+      //  vertical_three.setLayoutParams();
+        vertical_three.setLayoutParams(params);
+        Random random=new Random();
+        int color=Color.argb(255,random.nextInt(256),random.nextInt(256),random.nextInt(256));
+
+        imgview.setColorFilter(color);
+
+        convertView.setLayoutParams(new GridView.LayoutParams(480, 210));
+
+       // GridView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+        File f= (File)getItem(position);;
+        folder_name.setText(f.getName());//xxxxxxxxxxxxxx
         return convertView;
+
+
+
     }
 
 

@@ -200,19 +200,26 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 final String item = (String)parent.getItemAtPosition(position);
                 AlertDialog aldg;
                 AlertDialog.Builder adBd=new AlertDialog.Builder(SftpMenu.this);
-                adBd.setTitle("My Dialog");
+                adBd.setTitle("Download");
                 adBd.setMessage("Do you want to download this file");
                 adBd.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //finish();
-                        onStartDownload();
-                        Message msg = Message.obtain(sftpHandler);
-                        msg.what=DOWNLOAD;
-                        Bundle b = new Bundle();
-                        b.putString("fn",item);
-                        msg.setData(b);
-                        msg.sendToTarget();
+                                Log.d(TAG,"line 210"+downLoadPath);
+                                Message msg = Message.obtain(sftpHandler);
+                                msg.what=DOWNLOAD;
+                                Bundle b = new Bundle();
+                                b.putString("fn",item);
+                                msg.setData(b);
+                        onStartDownload(msg);
+
+//                        Message msg = Message.obtain(sftpHandler);
+//                        msg.what=DOWNLOAD;
+//                        Bundle b = new Bundle();
+//                        b.putString("fn",item);
+//                        msg.setData(b);
+//                        msg.sendToTarget();
                     }
                 });
                 adBd.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -346,8 +353,9 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                         }
                         if(msg.what==DOWNLOAD){
                                 Log.d(TAG,"line276");
-                                String str = msg.getData().getString("fn");
-                                boolean isSuccess = sftp.downloadFile(currentPath,str,downLoadPath,str);
+                                String filename = msg.getData().getString("fn");
+                                String olddownloadPath =downLoadPath;
+                                boolean isSuccess = sftp.downloadFile(currentPath,filename,downLoadPath,filename);
                                 Log.d(TAG,isSuccess+"line276");
                                onFinishDownload(isSuccess);
                                 }
@@ -358,7 +366,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 switch (v.getId()) {
                     case R.id.button_upload: {
                         //上传文件
-                        Log.d(TAG, "上传文件");
+                        Log.d(TAG, "upload");
                         String[] para =onstartUpload();
                         while(true){
                             if(para[0]=="null" || para[1] == "null"){
@@ -376,9 +384,10 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                         String filename=para[1];
                         Message select=uiHandler.obtainMessage();
                         select.what=SELECT_TOAST;
-                        select.obj="Luckily"+filename +"are uploaded from source path:"+source;
+                        select.obj="Luckily "+filename +" are uploaded from source path: \n"+source;
                         select.sendToTarget();
-                        sftp.uploadFile(currentPath, filename, downLoadPath, filename);
+                     //   sftp.uploadFile(currentPath, filename, downLoadPath, filename);
+                        sftp.uploadFile(currentPath, filename, source, filename);
 
                         updateDir();
                         onFinishUpload();
@@ -423,6 +432,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             return onuploadParas;
         }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode==9 && resultCode==1){
@@ -431,12 +441,25 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             onuploadParas[1]=file;
             onuploadParas[0]=path;
         }
+        if(requestCode==8 && resultCode==2){
+            String file = data.getStringExtra("file");
+            String path = data.getStringExtra("path");
+            Log.d(TAG,file+" "+path);
+            downLoadPath=path+"/"+file;
+            Toast.makeText(SftpMenu.this,"Start DownLoad to "+downLoadPath,Toast.LENGTH_LONG).show();
+            downloadmsg.sendToTarget();
+        }
     }
 
     private void onFinishUpload(){ }
-    protected void onStartDownload(){
-        Toast.makeText(SftpMenu.this,"Start DownLoad",Toast.LENGTH_LONG).show();
-    }
+    Message downloadmsg;
+    protected void onStartDownload(Message msg){
+            int requestCode = 8;
+            Intent getFilename = new Intent(this,SelectDownloadActivity.class);
+            startActivityForResult(getFilename,requestCode);
+            downloadmsg=msg;
+
+    }//xxxxx
         private void onFinishDownload(boolean isSuccess){
             Message downloadVerify;
             if(isSuccess == true){

@@ -63,28 +63,25 @@ public class FolderActivity extends AppCompatActivity {
         curPathStack = new Stack<String>();
         //rootPath = getFilesDir().getAbsolutePath();
       //  rootPath = Environment.getExternalStorageDirectory().toString();
-        rootPath=loadLocalFolder().toString();
-        Log.d(TAG,rootPath);
+
+            rootPath = loadLocalFolder().toString();
+            Log.d(TAG, rootPath);
         curPathStack.push(rootPath);
+
 
         //read the file[] of external directory to a file array - in comment
         //now I use the internal directory version
         Log.d(TAG, "Sucessful read external storage with length = "+Environment.getExternalStorageDirectory());
-        File [] files =new File(rootPath).listFiles();
-        //File[] files = getFilesDir().listFiles();
-        ArrayList<File> filesl =new ArrayList<File>();
-        for(int i=0;i<files.length;i++){
-            fileList.add(files[i]);
+
+        String folder =getIntent().getStringExtra("MainIntent");
+        if(folder!=null){
+                curPathStack.push("/"+folder);
         }
-
-
-
-        //Init the representation layer
-
         lFolderlist =findViewById(R.id.lFolderExplore);
         tCurPath = findViewById(R.id.tCurrentDir);
         tCurPath.setText(getPathString());
         fad = new FileAdaptor(this,R.layout.item_type1,fileList);
+        showChange(getPathString());
         initAdaptor();
         initListener();
     }
@@ -100,17 +97,6 @@ public class FolderActivity extends AppCompatActivity {
 
     protected File loadLocalFolder(){
         File file = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument");
-        File localFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Local");
-        File remoteFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Remote");
-        if(!file.exists()){
-            file.mkdir();
-            localFolder.mkdir();
-
-            remoteFolder.mkdir();
-
-        }
-        localPath = localFolder.toString();
-        remotePath = remoteFolder.toString();
         return file;
     }
 
@@ -136,18 +122,20 @@ public class FolderActivity extends AppCompatActivity {
                 File itemf = (File) parent.getAdapter().getItem(position);
                 String name = itemf.getName();
                 Log.d(TAG,name+"is clcked");
-                if(FileUtils.fileType(name) == "folder") {
-                    curPathStack.push("/" + name);
-                    showChange(getPathString());
-                }else{
-
-                    //Toast.makeText(FolderActivity.this,"It doesn't has children folder",Toast.LENGTH_LONG).show();
-                    operateFile(name,getPathString());
-                }
+                operateFolder(name);
             }
         });
     }
+    public void operateFolder(String name){
+        if(FileUtils.fileType(name) == "folder") {
+            curPathStack.push("/" + name);
+            showChange(getPathString());
+        }else{
 
+            //Toast.makeText(FolderActivity.this,"It doesn't has children folder",Toast.LENGTH_LONG).show();
+            operateFile(name,getPathString());
+        }
+    }
 
 
     public void operateFile(String fileName,String pathName){

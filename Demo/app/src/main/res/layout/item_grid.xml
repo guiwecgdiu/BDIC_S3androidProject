@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:listSelector="@null"
+    android:elevation="10dp"
+   >
+
+
+
+    <ImageView
+        android:id="@+id/folderIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="13dp"
+        android:src="@drawable/folder_green"
+        />
     <TextView
-        android:id="@+id/grid_hostname"
-        android:layout_width="100dp"
-        android:layout_height="90dp"
-        android:gravity="center"
-        android:text="IP_name"/>
-    <TextView
-        android:id="@+id/grid_ip_address"
-        android:layout_width="100dp"
+        android:id="@+id/folderName"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="Document"
+        android:textSize="16sp"
+        android:layout_marginLeft="40dp"
+        android:layout_centerVertical="true"/>
+
+
+    <ImageView
+        android:id="@+id/vert_three"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/grid_hostname"
-        android:text="IPaddress"
-        android:gravity="center_horizontal"
+        android:src="@mipmap/ic_more_vert"
+        android:layout_marginLeft="140dp"
+        android:layout_centerVertical="true"
         />
 
 </RelativeLayout>

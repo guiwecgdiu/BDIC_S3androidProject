@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,12 +20,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -39,6 +44,7 @@ import com.example.myapplication.presentation.FieldDialogFragment;
 import com.example.myapplication.presentation.GridAdaptor;
 import com.example.myapplication.presentation.SiteInfoAdapter;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class MainMenu extends AppCompatActivity implements FieldDialogFragment.FieldDialogCallback {
@@ -50,18 +56,74 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
      */
     Button gofolder;
     LinearLayout addServer;
+    FloatingActionButton fad;
+    GridView folderGrids;
+    GridAdaptor gridAdaptor;
+    ArrayList<File> foldersList;
  //   GridView gridFile;
     RecyclerView siteView;
   //  GridAdaptor gridAdaptor;
     SiteInfoAdapter siteAdapter;
     ArrayList<SiteInfo> siteInfoListArray;
+
+    String rootPath;
+
+    static String remotePath;
+    static String localPath;
     /*
     * 2019/11/6
     * Set the click listenner
     * @param gofolder
     * @param goServer
      */
+    private String m_Text = "";
+    public void inpurDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Create Folder With Name:");
+
+// Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_TEXT);
+        GridLayout.LayoutParams params=new GridLayout.LayoutParams();
+        params.setMargins(20,0,20,0);
+        input.setLayoutParams(params);
+        builder.setView(input);
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                m_Text = input.getText().toString();
+                File localFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/"+m_Text);
+                if(!localFolder.exists()){
+                    localFolder.mkdir();
+
+                }
+                loadFolders();
+                gridAdaptor.notifyDataSetChanged();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+
+
+        builder.show();
+    }
     private void initClickListenner(){
+        fad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inpurDialog();
+
+            }
+        });
+
 
         gofolder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,9 +187,60 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
 
 
     private void init(){
+      fad=findViewById(R.id.btn_float);
       gofolder= findViewById(R.id.bFolder_mainmenu);
       addServer = findViewById(R.id.baddServer);
       //gridFile = (GridView)findViewById(R.id.bFileGrid);
+        this.folderGrids=findViewById(R.id.gridFolders);
+        gridAdaptor=new GridAdaptor(this,foldersList);
+        folderGrids.setAdapter(gridAdaptor);
+        folderGrids.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                File file =(File) parent.getAdapter().getItem(position);
+                Intent i =new Intent(MainMenu.this,FolderActivity.class);
+                i.putExtra("MainIntent",file.getName());
+                startActivity(i);
+
+            }
+        });
+        folderGrids.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final File item =(File)parent.getAdapter().getItem(position);
+                AlertDialog aldg;
+                AlertDialog.Builder adBd=new AlertDialog.Builder(MainMenu.this);
+                adBd.setTitle("Alert");
+                adBd.setMessage("Do you want to delete this folder and all files");
+                adBd.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //finish();
+                        Boolean isSuccess=deleteDir(item);
+                        loadFolders();
+                        gridAdaptor.notifyDataSetChanged();
+                        if (isSuccess) {
+                            Toast.makeText(MainMenu.this,"Delete success", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MainMenu.this, "Failed to delete", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                adBd.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                aldg=adBd.create();
+                aldg.show();
+                return true;
+            }
+        });
+
+
+
+
         siteView = (RecyclerView) findViewById(R.id.siteinfoView);
         siteInfoListArray =new ArrayList<SiteInfo>();
 
@@ -144,6 +257,20 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         siteAdapter.notifyDataSetChanged();
 
         //xxxx
+
+    }
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        return dir.delete();
     }
 
 
@@ -172,8 +299,25 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         //setContentView(R.layout.activity_main_menu);
         setContentView(R.layout.entry_main);
         powerPermission();
+        initData();
         init();
         initClickListenner();
+
+    }
+
+    protected void initData(){
+        foldersList=new ArrayList<File>();
+        loadFolders();
+    }
+    File rootFolder;
+    protected void loadFolders(){
+        foldersList.clear();
+        rootFolder = loadLocalFolder();
+        File [] subfolders = rootFolder.listFiles();
+        Log.d(TAG,subfolders.length+"");
+        for(int i=0;i<subfolders.length;i++){
+            foldersList.add(subfolders[i]);
+        }
 
     }
 
@@ -223,6 +367,22 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         }
     }
 
+    protected File loadLocalFolder(){
+        File file = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument");
+        File localFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Local");
+        File remoteFolder = new File(Environment.getExternalStorageDirectory().toString()+"/lazyDocument"+"/Remote");
+        if(!file.exists()){
+            file.mkdir();
+            localFolder.mkdir();
+
+            remoteFolder.mkdir();
+
+        }
+        localPath = localFolder.toString();
+        remotePath = remoteFolder.toString();
+        Log.d(TAG,"I am here"+file.getName());
+        return file;
+    }
 
 
 
