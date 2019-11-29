@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="dismiss">Dismiss</string>
     <string name="save">Save</string>
-    <string name="DialogTitle">Course</string>
+    <string name="DialogTitle">SiteInfo</string>
 
 
     <string name="sitenav">Clound Server</string>

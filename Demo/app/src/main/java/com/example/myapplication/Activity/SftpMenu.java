@@ -180,6 +180,9 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         remoteAdaptor = new RemoteFileAdaptor(this,R.layout.item_type1,curPathFiles);
         lRemoteList.setAdapter(remoteAdaptor);
     }
+
+    public long TIME_INTERVAL=1000;
+    public long mLastClickTime;
     public void initListener(){
         //设置控件对应相应函数
         buttonUpLoad.setOnClickListener(this);
@@ -191,7 +194,16 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 
                 ListView l = (ListView)parent;
                 String item =(String) l.getAdapter().getItem(position);
-                cdViaItem(item);
+                long nowTime = System.currentTimeMillis();
+                if (nowTime - mLastClickTime > TIME_INTERVAL) {
+                    // do something
+                    cdViaItem(item);
+                    mLastClickTime = nowTime;
+                } else {
+                    Toast.makeText(SftpMenu.this, "Don't quickly double click", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
         lRemoteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

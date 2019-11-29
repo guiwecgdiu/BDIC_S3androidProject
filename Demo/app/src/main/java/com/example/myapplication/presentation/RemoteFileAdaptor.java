@@ -1,6 +1,7 @@
 package com.example.myapplication.presentation;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.zip.Inflater;
 
 public class RemoteFileAdaptor extends ArrayAdapter<String> {
+    String TAG="temp";
    int resourceId;
 
     public RemoteFileAdaptor(Context context, int resource, ArrayList<String> objects) {
@@ -28,11 +30,14 @@ public class RemoteFileAdaptor extends ArrayAdapter<String> {
         View v = LayoutInflater.from(getContext()).inflate(resourceId,parent,false);
         ImageView imageView = v.findViewById(R.id.iFileIcon);
         TextView textView = v.findViewById(R.id.iFileName);
+        Log.d(TAG,fileType(fileName));
         if(fileType(fileName)=="folder") {
             imageView.setImageResource(R.mipmap.folder);
-        }else if(fileType(fileName).length()>0) {
+        }else if(fileType(fileName).equals("html")) {
             imageView.setImageResource(R.mipmap.html);
-        }else{
+        }else if(fileType(fileName).equals("gif")) {
+            imageView.setImageResource(R.mipmap.html);
+        }else {
             imageView.setImageResource(R.mipmap.folder);
         }
         textView.setText(fileName);

@@ -10,25 +10,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/darker_gray"
-        android:text="SFTP上传下载测试 "/>
+        android:text="Coneection View "/>
 
     <Button
         android:id="@+id/button_upload"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="上传"
+        android:text="Upload"
+        android:textColor="@android:color/white"
+        android:background="@drawable/rectangle"
+        android:backgroundTint="@color/design_default_color_primary"
         />
 
     <Button
         android:id="@+id/connect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="连接"/>
+        android:text="Connect"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/design_default_color_primary"/>
     <Button
         android:id="@+id/disconnect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="断开"/>
+        android:text="Disconnect"/>
     <ListView
         android:id="@+id/lRemoteList"
         android:layout_width="match_parent"
