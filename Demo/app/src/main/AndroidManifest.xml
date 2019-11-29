@@ -14,10 +14,12 @@
         android:roundIcon="@mipmap/ic_ftplauncher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".BaseActivity"></activity>
-        <activity android:name=".Test">
-
-        </activity>
+        <activity
+            android:name=".Activity.ShareActivity"
+            android:label="@string/title_activity_share"
+            android:theme="@style/AppTheme.NoActionBar.NoActionBar"></activity>
+        <activity android:name=".BaseActivity" />
+        <activity android:name=".Test"></activity>
         <activity android:name=".Activity.MainMenu">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

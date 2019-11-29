@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.myapplication.FileUtils.FileUtils;
 import com.example.myapplication.R;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class FileAdaptor extends ArrayAdapter<File> {
      ImageView iIcon = v.findViewById(R.id.iFileIcon);
      TextView iFileName = v.findViewById(R.id.iFileName);
 
-     iIcon.setImageResource(R.mipmap.folder);
+     iIcon.setImageResource(FileUtils.getFileIcon(f));
      iFileName.setText(f.getName());
 
     return v;

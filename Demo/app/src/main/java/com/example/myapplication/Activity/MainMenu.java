@@ -5,41 +5,41 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.os.Environment;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.DBStorage.SiteInfoSQLiteOpenHelper;
-import com.example.myapplication.FileUtils.RequestCode;
 import com.example.myapplication.Model.SiteInfo;
 import com.example.myapplication.R;
-import com.example.myapplication.Test;
 import com.example.myapplication.presentation.FieldDialogFragment;
 import com.example.myapplication.presentation.GridAdaptor;
 import com.example.myapplication.presentation.SiteInfoAdapter;
@@ -47,7 +47,7 @@ import com.example.myapplication.presentation.SiteInfoAdapter;
 import java.io.File;
 import java.util.ArrayList;
 
-public class MainMenu extends AppCompatActivity implements FieldDialogFragment.FieldDialogCallback {
+public class MainMenu extends AppCompatActivity implements FieldDialogFragment.FieldDialogCallback,NavigationView.OnNavigationItemSelectedListener{
     final String TAG = "MainMenu";
     /**
      *  2019/11/6
@@ -115,6 +115,8 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
 
         builder.show();
     }
+
+
     private void initClickListenner(){
         fad.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,6 +180,69 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
         });
     }
 
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.share, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            // Handle the camera action
+            Intent i= new Intent(this, MainMenu.class);
+            startActivity(i);
+        } else if (id == R.id.nav_document) {
+            Intent i= new Intent(this, FolderActivity.class);
+            startActivity(i);
+
+        } else if (id == R.id.nav_InTest) {
+            Intent i= new Intent(this, ShareActivity.class);
+            startActivity(i);
+        } else if (id == R.id.nav_about) {
+
+        } else if (id == R.id.nav_github) {
+
+        } else if (id == R.id.nav_blog) {
+
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
     /*
      * 2019/11/6
     * Init the components
@@ -187,6 +252,19 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
 
 
     private void init(){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setSubtitleTextAppearance(this,R.style.Toolbar_TitleText);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.getDrawerArrowDrawable().setColor(Color.BLACK);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+
+
       fad=findViewById(R.id.btn_float);
       gofolder= findViewById(R.id.bFolder_mainmenu);
       addServer = findViewById(R.id.baddServer);
@@ -471,7 +549,7 @@ public class MainMenu extends AppCompatActivity implements FieldDialogFragment.F
     }
 
     public void test(View view) {
-        Intent i= new Intent(this, Test.class);
+        Intent i= new Intent(this, ShareActivity.class);
         startActivity(i);
     }
 }

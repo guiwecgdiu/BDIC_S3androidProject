@@ -7,17 +7,7 @@
     android:background="@drawable/rectangle"
     android:backgroundTint="?attr/colorPrimary"
     >
-    <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@mipmap/ic_add"
-        android:layout_marginLeft="15dp"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="My Driver"
-        android:layout_marginLeft="20dp"
-        android:textSize="20sp"
+
         />
 
 </android.support.v7.widget.Toolbar>

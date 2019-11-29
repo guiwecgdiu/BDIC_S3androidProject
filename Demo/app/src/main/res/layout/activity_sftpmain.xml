@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:text="Upload"
         android:textColor="@android:color/white"
-        android:background="@drawable/rectangle"
         android:backgroundTint="@color/design_default_color_primary"
         />
 

@@ -16,12 +16,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.FileUtils.FileUtils;
 import com.example.myapplication.Model.SiteInfo;
 import com.example.myapplication.R;
 import com.example.myapplication.SFTPUtilis.SFTPUtils;
 import com.example.myapplication.presentation.RemoteFileAdaptor;
 import com.jcraft.jsch.ChannelSftp;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Stack;
@@ -181,7 +183,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
         lRemoteList.setAdapter(remoteAdaptor);
     }
 
-    public long TIME_INTERVAL=1000;
+    public long TIME_INTERVAL=3000;
     public long mLastClickTime;
     public void initListener(){
         //设置控件对应相应函数
@@ -210,21 +212,25 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final String item = (String)parent.getItemAtPosition(position);
-                AlertDialog aldg;
-                AlertDialog.Builder adBd=new AlertDialog.Builder(SftpMenu.this);
-                adBd.setTitle("Download");
-                adBd.setMessage("Do you want to download this file");
-                adBd.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //finish();
-                                Log.d(TAG,"line 210"+downLoadPath);
-                                Message msg = Message.obtain(sftpHandler);
-                                msg.what=DOWNLOAD;
-                                Bundle b = new Bundle();
-                                b.putString("fn",item);
-                                msg.setData(b);
-                        onStartDownload(msg);
+                if(FileUtils.fileType(item)=="folder"){
+                        return false;
+                }else {
+                    AlertDialog aldg;
+                    AlertDialog.Builder adBd = new AlertDialog.Builder(SftpMenu.this);
+                    adBd.setTitle("Download");
+                    adBd.setMessage("Do you want to download this file");
+                    adBd.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //finish();
+                            Log.d(TAG, "line 210" + downLoadPath);
+                            Message msg = Message.obtain(sftpHandler);
+                            msg.what = DOWNLOAD;
+                            Bundle b = new Bundle();
+                            b.putString("fn", item);
+                            msg.setData(b);
+                            onStartDownload(msg);
+                        }
 
 //                        Message msg = Message.obtain(sftpHandler);
 //                        msg.what=DOWNLOAD;
@@ -232,18 +238,20 @@ public class SftpMenu extends Activity implements View.OnClickListener {
 //                        b.putString("fn",item);
 //                        msg.setData(b);
 //                        msg.sendToTarget();
-                    }
-                });
-                adBd.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                });
-                aldg=adBd.create();
-                aldg.show();
+                    });
+                    adBd.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                return true;
+                        }
+                    });
+                    aldg = adBd.create();
+                    aldg.show();
+                    return true;
+                }
+
+
             }
         });
 
@@ -407,20 +415,29 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                     break;
 
                     case R.id.connect:{
-                        sftp.connect();
-                        Message conncting=Message.obtain();
-                        conncting.what= MSG_WAIRTING;
-                        uiHandler.sendMessage(conncting);
-                        Log.d(TAG,"Connect Start");
-                       rootPath=sftp.currentRemotePath();
+                        long nowTime = System.currentTimeMillis();
+                        if (nowTime - mLastClickTime > TIME_INTERVAL) {
+                            // do something
+                            sftp.connect();
+                            Message conncting=Message.obtain();
+                            conncting.what= MSG_WAIRTING;
+                            uiHandler.sendMessage(conncting);
+                            Log.d(TAG,"Connect Start");
+                            findViewById(R.id.connect).setVisibility(View.INVISIBLE);
+                            rootPath=sftp.currentRemotePath();
                             pathStack.push(rootPath);
                             updateDir();
+                        } else {
+                            Toast.makeText(SftpMenu.this, "Don't quickly double click", Toast.LENGTH_SHORT).show();
+                        }
+
 
                        }
                     break;
 
                     case R.id.disconnect:{
                         sftp.disconnect();
+                        pathStack.clear();
 
                     }
                     break;

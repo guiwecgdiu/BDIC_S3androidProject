@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.myapplication.FileUtils.FileUtils;
 import com.example.myapplication.R;
 
 import java.io.File;
@@ -31,15 +32,8 @@ public class RemoteFileAdaptor extends ArrayAdapter<String> {
         ImageView imageView = v.findViewById(R.id.iFileIcon);
         TextView textView = v.findViewById(R.id.iFileName);
         Log.d(TAG,fileType(fileName));
-        if(fileType(fileName)=="folder") {
-            imageView.setImageResource(R.mipmap.folder);
-        }else if(fileType(fileName).equals("html")) {
-            imageView.setImageResource(R.mipmap.html);
-        }else if(fileType(fileName).equals("gif")) {
-            imageView.setImageResource(R.mipmap.html);
-        }else {
-            imageView.setImageResource(R.mipmap.folder);
-        }
+
+        imageView.setImageResource(FileUtils.getFileIcon(fileName));
         textView.setText(fileName);
 
         return v;
