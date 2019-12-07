@@ -145,7 +145,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                 if(msg.what == MSG_LOADDIR){
                     Log.d(TAG,"show dir");
                     remoteAdaptor.notifyDataSetChanged();
-                    Toast.makeText(SftpMenu.this,"Cd to"+currentPath,Toast.LENGTH_LONG).show();
+                    Toast.makeText(SftpMenu.this,"Cd to PATH\n"+currentPath,Toast.LENGTH_LONG).show();
                     }
                 if(msg.what == DOWNLOAD_TOAST){
                     Log.d(TAG,"Here");
@@ -394,7 +394,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
                             }else{
                                 Message select=uiHandler.obtainMessage();
                                 select.what=SELECT_TOAST;
-                                select.obj="break";
+                                select.obj="File has selected";
                                 select.sendToTarget();
 
                                 break;
@@ -475,7 +475,7 @@ public class SftpMenu extends Activity implements View.OnClickListener {
             String path = data.getStringExtra("path");
             Log.d(TAG,file+" "+path);
             downLoadPath=path+"/"+file;
-            Toast.makeText(SftpMenu.this,"Start DownLoad to "+downLoadPath,Toast.LENGTH_LONG).show();
+            Toast.makeText(SftpMenu.this,"Start DownLoad to Path: <"+downLoadPath+">",Toast.LENGTH_LONG).show();
             downloadmsg.sendToTarget();
         }
     }
