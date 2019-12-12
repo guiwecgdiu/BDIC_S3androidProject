@@ -31,6 +31,12 @@ import java.util.Enumeration;
 import java.util.Stack;
 
 public class FolderActivity extends AppCompatActivity {
+
+
+    /*
+        1.Android file manager:https://blog.csdn.net/UUUUUltraman/article/details/89135394
+        2.Android handler:https://developer.android.com/reference/android/os/Handler
+     */
     final String TAG ="FolderActivitys";
     int i;
     /**

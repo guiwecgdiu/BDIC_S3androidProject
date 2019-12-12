@@ -24,6 +24,12 @@ import java.util.Properties;
 import java.util.Vector;
 
     public class SFTPUtils {
+        /*
+          1.JSCH API Document: https://epaul.github.io/jsch-documentation/javadoc/
+          2.JSCH tutor in StackOverflow https://stackoverflow.com/questions/41050989/basic-ssh-connection-via-jsch-on-android
+          3.JSCH android sample:https://www.jianshu.com/p/64d571913185
+         */
+
 
         private String TAG="SFTPUtils";
         private String host;
@@ -70,7 +76,7 @@ import java.util.Vector;
 
 
         /**
-         * 断开服务器
+         * disconnect
          */
         public void disconnect() {
             if (this.sftp != null) {
@@ -100,7 +106,7 @@ import java.util.Vector;
        }
 
         /**
-         * 单个文件上传
+         * upload
          * @param remotePath
          * @param remoteFileName
          * @param localPath
@@ -135,32 +141,11 @@ import java.util.Vector;
             return false;
         }
 
-        /**
-         * 批量上传
-         * @param remotePath
-         * @param localPath
-         * @param del
-         * @return
-         */
+
 
 
         /**
-         * 批量下载文件
-         *
-         * @param remotPath
-         *            远程下载目录(以路径符号结束)
-         * @param localPath
-         *            本地保存目录(以路径符号结束)
-         * @param fileFormat
-         *            下载文件格式(以特定字符开头,为空不做检验)
-         * @param del
-         *            下载后是否删除sftp文件
-         * @return
-         */
-
-
-        /**
-         * 单个文件下载
+         * Download
          * @param remotePath
          * @param remoteFileName
          * @param localPath
@@ -184,21 +169,6 @@ import java.util.Vector;
             return false;
         }
 
-        /**
-         * 删除文件
-         * @param filePath
-         * @return
-         */
-        public boolean deleteFile(String filePath) {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                return false;
-            }
-            if (!file.isFile()) {
-                return false;
-            }
-            return file.delete();
-        }
 
         public boolean createDir(String createpath) {
             try {
@@ -230,11 +200,11 @@ import java.util.Vector;
         }
 
         /**
-         * 判断目录是否存在
+         * Does dir exist
          * @param directory
          * @return
          */
-        @SuppressLint("DefaultLocale")
+
         public boolean isDirExist(String directory) {
             boolean isDirExistFlag = false;
             try {
@@ -249,17 +219,11 @@ import java.util.Vector;
             return isDirExistFlag;
         }
 
-        public void deleteSFTP(String directory, String deleteFile) {
-            try {
-                sftp.cd(directory);
-                sftp.rm(deleteFile);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+
+
 
         /**
-         * 创建目录
+         * make dirs
          * @param path
          */
         public void mkdirs(String path) {
